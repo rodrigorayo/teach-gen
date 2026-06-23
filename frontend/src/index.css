@@ -1,0 +1,625 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* UAB Dark Mode - Deep Dark Blue & White */
+  --color-bg: #0A0F1D; /* Deep UAB Navy */
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-hover: rgba(255, 255, 255, 0.09);
+  --color-text: #F8FAFC;
+  --color-text-muted: #94A3B8;
+  
+  /* Accent Colors */
+  --color-primary: #3B82F6;    /* UAB Blue */
+  --color-secondary: #10B981;  /* Mint Green */
+  --color-accent: #F59E0B;     /* Amber */
+  --color-danger: #EF4444;     /* Coral Red */
+  --color-success: #10B981;    
+  --color-whatsapp: #25D366;
+  
+  --shadow-glow: 0 4px 20px rgba(59, 130, 246, 0.25);
+  --shadow-glow-accent: 0 4px 20px rgba(245, 158, 11, 0.25);
+  --shadow-card: 0 12px 36px rgba(0, 0, 0, 0.35);
+  --border-radius: 28px; /* Android 16 Widget Rounded Corner */
+  --border-color: rgba(255, 255, 255, 0.04);
+  
+  /* Bouncy spring-like easing for organic motion */
+  --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+body.light-theme {
+  /* UAB Light Mode - Slate White & Deep Dark Blue */
+  --color-bg: #F8FAFC; /* Slate white background */
+  --color-surface: #FFFFFF; /* Pure white container */
+  --color-surface-hover: #F1F5F9;
+  --color-text: #0F172A; /* Deep dark blue text */
+  --color-text-muted: #64748B;
+  
+  --color-primary: #1E3A8A;    /* UAB Deep Dark Blue */
+  --color-secondary: #059669;
+  --color-accent: #D97706;
+  --color-danger: #DC2626;
+  --color-success: #059669;
+  
+  --shadow-glow: 0 4px 20px rgba(30, 58, 138, 0.2);
+  --shadow-glow-accent: 0 4px 20px rgba(217, 119, 6, 0.2);
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* App Wrapper */
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+  animation: pageSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Material Tonal elevation Card */
+.card {
+  background: var(--color-surface);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.015);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  background: var(--color-surface-hover);
+  border-color: rgba(168, 199, 250, 0.2);
+}
+
+.card:hover::before {
+  opacity: 0.8;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+h1 { 
+  font-size: 2.5rem; 
+  font-weight: 600; 
+  color: #fff; 
+  letter-spacing: -0.025em;
+}
+
+h2 { font-size: 1.8rem; font-weight: 600; margin-bottom: 1rem; color: #fff; }
+h3 { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; }
+.text-muted { color: var(--color-text-muted); font-size: 0.9rem; }
+
+/* Inputs & Forms with Material Design 3 Focus Ring */
+input, select, textarea {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  color: white;
+  font-size: 1rem;
+  transition: var(--transition);
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(168, 199, 250, 0.25);
+  background: rgba(0,0,0,0.4);
+}
+
+/* Pill-shaped Buttons with Ripple Effect */
+.btn {
+  padding: 0.8rem 1.8rem;
+  border-radius: 9999px; /* Pill */
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* CSS Ripple click micro-interaction */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100px; height: 100px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.5s;
+  pointer-events: none;
+}
+
+.btn:active::after {
+  transform: translate(-50%, -50%) scale(4);
+  opacity: 1;
+  transition: 0s;
+}
+
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #111318;
+}
+
+.btn-primary::after {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:hover {
+  background: #c3dcff;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.btn-secondary:hover { 
+  background: rgba(255,255,255,0.12); 
+  transform: translateY(-2px) scale(1.03);
+}
+
+.btn-success { 
+  background: var(--color-success); 
+  color: #111318; 
+}
+
+.btn-success::after {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.btn-success:hover { 
+  background: #cef6c0; 
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(184, 230, 201, 0.25);
+}
+
+.btn-danger { 
+  background: var(--color-danger); 
+  color: #111318; 
+}
+
+.btn-danger::after {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.btn-danger:hover { 
+  background: #f7d2d0; 
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(242, 184, 181, 0.25);
+}
+
+/* Breadcrumbs Chip style path */
+.breadcrumbs {
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.breadcrumbs span { 
+  cursor: pointer; 
+  transition: var(--transition); 
+  padding: 0.4rem 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 9999px; /* Pill chip */
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.breadcrumbs span:hover { 
+  color: #111318; 
+  background: var(--color-primary); 
+  box-shadow: 0 4px 12px rgba(168, 199, 250, 0.2);
+}
+
+.breadcrumbs .separator {
+  color: rgba(255,255,255,0.15);
+  margin: 0;
+  cursor: default;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.breadcrumbs .separator:hover {
+  color: rgba(255,255,255,0.15);
+  background: none;
+  box-shadow: none;
+}
+
+/* Grid Layouts */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Keyframe Animations (Pure fade for pages to prevent position fixed bugs) */
+@keyframes pageSlideUp {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalZoom {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulseBorder {
+  0% { border-color: rgba(168, 199, 250, 0.2); }
+  50% { border-color: rgba(168, 199, 250, 0.6); }
+  100% { border-color: rgba(168, 199, 250, 0.2); }
+}
+
+.fade-in { animation: pageSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* Modal Android 16 Dialog Sheet */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 11, 15, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.modal-overlay .card {
+  animation: modalZoom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  max-width: 100%;
+  border-radius: 28px;
+  background: #1E202B;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* Material Tonal Pill Tabs */
+.tabs {
+  display: flex; 
+  gap: 0.5rem; 
+  margin-bottom: 2.5rem; 
+  border-bottom: none;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.4rem;
+  border-radius: 9999px; /* Pill container */
+  width: fit-content;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  padding: 0.6rem 1.4rem; 
+  cursor: pointer; 
+  border-radius: 9999px; /* Pill tab */
+  border-bottom: none; 
+  transition: var(--transition);
+  font-weight: 500; 
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.tab.active { 
+  color: #111318; 
+  background: var(--color-primary);
+  text-shadow: none;
+}
+.tab:hover:not(.active) { 
+  color: white; 
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive Scroll Container for Agile Table */
+.agile-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-card);
+  background: rgba(30, 32, 43, 0.4);
+}
+
+/* Agile Grid Matrix */
+.agile-grid {
+  display: grid;
+  gap: 2px; /* tiny gap between rounded tiles */
+  background: rgba(255, 255, 255, 0.03);
+  min-width: 800px;
+}
+
+.agile-cell {
+  background: #14161F;
+  padding: 1.2rem;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.agile-header { 
+  background: #1E202B; 
+  font-weight: 600; 
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.clickable-cell { 
+  cursor: pointer; 
+  user-select: none;
+  border-radius: 6px; /* rounded tiles */
+}
+.clickable-cell:hover { 
+  background: rgba(255, 255, 255, 0.05); 
+  transform: scale(0.95);
+}
+.clickable-cell.completed { 
+  background: rgba(184, 230, 201, 0.16); 
+  color: var(--color-success); 
+  box-shadow: inset 0 0 0 1px rgba(184, 230, 201, 0.25);
+}
+.clickable-cell.failed { 
+  background: rgba(242, 184, 181, 0.16); 
+  color: var(--color-danger); 
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 181, 0.25);
+}
+.clickable-cell.pending {
+  background: rgba(245, 223, 184, 0.16);
+  color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px rgba(245, 223, 184, 0.25);
+}
+.clickable-cell.licensed {
+  background: rgba(139, 92, 246, 0.16);
+  color: #A78BFA;
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.25);
+}
+.disabled-cell {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.student-name-short {
+  display: none;
+}
+.student-name-full {
+  display: inline;
+}
+
+/* Badge for Finalized session */
+.badge-finalized {
+  background: rgba(184, 230, 201, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(184, 230, 201, 0.3);
+  padding: 0.4rem 1.1rem;
+  border-radius: 9999px; /* Pill */
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 0 15px rgba(184, 230, 201, 0.15);
+  animation: pulseBorder 3s infinite;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 768px) {
+  :root {
+    --border-radius: 20px;
+  }
+  
+  .student-name-short {
+    display: inline;
+  }
+  .student-name-full {
+    display: none;
+  }
+  .app-container {
+    padding: 1.5rem 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  /* Flex wrap layouts for lists */
+  .tabs {
+    margin-bottom: 1.5rem;
+    border-radius: 24px;
+    width: 100%;
+  }
+  
+  .tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Modal responsive adjustment */
+  .modal-overlay .card {
+    width: 100% !important;
+    padding: 1.5rem;
+    border-radius: 24px;
+  }
+  
+  /* Admin layout */
+  main {
+    flex-direction: column;
+    gap: 1.5rem !important;
+  }
+  
+  /* Student Report Tab responsive */
+  .fade-in[style*="display: flex"] {
+    flex-direction: column;
+    gap: 1.5rem !important;
+  }
+}
+
+/* Light Theme Overrides */
+body.light-theme input, 
+body.light-theme select, 
+body.light-theme textarea {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #0F172A;
+}
+
+body.light-theme input:focus, 
+body.light-theme select:focus, 
+body.light-theme textarea:focus {
+  background: #FFFFFF;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+body.light-theme .agile-cell {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #0F172A;
+}
+
+body.light-theme .agile-header {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .agile-container {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .clickable-cell.completed {
+  background: rgba(5, 150, 105, 0.12);
+  color: var(--color-success);
+}
+
+body.light-theme .clickable-cell.failed {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--color-danger);
+}
+
+body.light-theme .clickable-cell.pending {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--color-accent);
+}
+
+body.light-theme .clickable-cell.licensed {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7C3AED;
+}
+
+body.light-theme .disabled-cell {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .tabs {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .tab.active {
+  color: #FFFFFF;
+  background: var(--color-primary);
+}
+
+body.light-theme .modal-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+body.light-theme .modal-overlay .card {
+  background: #FFFFFF;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+body.light-theme .breadcrumbs span {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+body.light-theme .breadcrumbs span:hover {
+  color: #FFFFFF;
+  background: var(--color-primary);
+}
+
