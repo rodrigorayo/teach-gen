@@ -7,7 +7,6 @@ export default function ClassSessionView() {
   const navigate = useNavigate();
   const [students, setStudents] = useState<any[]>([]);
   const [sessionDate, setSessionDate] = useState("");
-  const [sessionId, setSessionId] = useState<number | null>(null);
   const [activityId, setActivityId] = useState<number | null>(null);
   const [completions, setCompletions] = useState<Record<number, boolean | null>>({});
 
@@ -25,7 +24,6 @@ export default function ClassSessionView() {
       // In a real app we'd fetch first, or have a Unit selector.
       const sessRes = await api.post('/sessions', { session_date: today, unit_id: 1 }).catch(() => null);
       const sid = sessRes?.data?.id || 1; 
-      setSessionId(sid);
 
       // Create an activity for today
       const actRes = await api.post('/activities', { title: `Actividad ${today}`, session_id: sid }).catch(() => null);

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './views/Login';
 import AdminDashboard from './views/AdminDashboard';
@@ -11,7 +11,7 @@ import Profile from './views/Profile';
 import './index.css';
 
 // Simple Guard
-const PrivateRoute = ({ children, role }: { children: JSX.Element, role: string }) => {
+const PrivateRoute = ({ children, role }: { children: React.ReactNode, role: string }) => {
   const currentRole = localStorage.getItem('role');
   const token = localStorage.getItem('token');
   

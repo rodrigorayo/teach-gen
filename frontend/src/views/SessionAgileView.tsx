@@ -26,7 +26,6 @@ export default function SessionAgileView() {
   const [actTitle, setActTitle] = useState('');
   
   const [randomStudentId, setRandomStudentId] = useState<number | null>(null);
-  const [showBehaviorFor, setShowBehaviorFor] = useState<number | null>(null);
 
   const [context, setContext] = useState<any>(null);
 
