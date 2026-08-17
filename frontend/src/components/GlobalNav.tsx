@@ -32,6 +32,14 @@ export default function GlobalNav({
   
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLight, setIsLight] = useState(false);
+  const [isMock, setIsMock] = useState(localStorage.getItem('use_mock') === 'true');
+
+  const toggleMock = () => {
+    const nextVal = !isMock;
+    localStorage.setItem('use_mock', nextVal ? 'true' : 'false');
+    setIsMock(nextVal);
+    window.location.reload();
+  };
 
   // Initialize theme
   useEffect(() => {
@@ -86,7 +94,35 @@ export default function GlobalNav({
       <header className="header" style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.25rem', marginBottom: '2rem' }}>
         <h1 style={{ margin: 0, fontSize: '2rem' }}>{title}</h1>
         
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Mock Design Mode Toggle Indicator */}
+          <button 
+            className="btn" 
+            onClick={toggleMock}
+            style={{ 
+              background: isMock ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255,255,255,0.04)', 
+              color: isMock ? '#A78BFA' : 'var(--color-text-muted)',
+              border: isMock ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '20px',
+              padding: '0.5rem 1rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontSize: '0.85rem'
+            }}
+            title={isMock ? "Modo Diseño Activo (Datos Locales). Clica para conectar al Servidor Real." : "Conectado al Servidor Real. Clica para activar Modo Diseño."}
+          >
+            <span style={{ 
+              display: 'inline-block', 
+              width: '8px', 
+              height: '8px', 
+              borderRadius: '50%', 
+              background: isMock ? '#8B5CF6' : 'var(--color-text-muted)',
+              boxShadow: isMock ? '0 0 8px #8B5CF6' : 'none'
+            }}></span>
+            {isMock ? "Modo Diseño" : "Modo API Real"}
+          </button>
+
           {/* Theme Quick Toggle */}
           <button 
             className="btn btn-secondary" 
@@ -226,6 +262,32 @@ export default function GlobalNav({
                       {unitName || "Unidad"}
                     </button>
                   )}
+                </>
+              )}
+
+              {isMock && (
+                <>
+                  <h4 style={{ fontSize: '0.8rem', color: '#A78BFA', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '1rem 0 0.2rem 0' }}>Herramientas de Diseño</h4>
+                  <button 
+                    className="btn btn-secondary" 
+                    style={{ 
+                      width: '100%', 
+                      justifyContent: 'flex-start', 
+                      padding: '0.8rem 1.2rem', 
+                      borderRadius: '16px',
+                      color: '#A78BFA',
+                      borderColor: 'rgba(139, 92, 246, 0.2)'
+                    }}
+                    onClick={() => {
+                      if (window.confirm("¿Deseas reiniciar los datos de prueba del modo diseño? Esto restaurará la clase y alumnos iniciales.")) {
+                        localStorage.removeItem("teach_gen_mock_db");
+                        window.location.reload();
+                      }
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    Reiniciar Datos Demo
+                  </button>
                 </>
               )}
             </div>
