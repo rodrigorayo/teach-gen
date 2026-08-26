@@ -19,10 +19,14 @@ export default function ProfessorDashboard() {
   const [deleteClassId, setDeleteClassId] = useState<number | null>(null);
   const [deleteClassName, setDeleteClassName] = useState('');
 
+  const [professorName, setProfessorName] = useState('');
+
   const fetchClasses = async () => {
     try {
       const res = await api.get('/classes');
       setClasses(res.data);
+      const me = await api.get('/auth/me');
+      setProfessorName(me.data.name || 'Profesor');
     } catch (e) {
       navigate('/login');
     }
@@ -64,6 +68,11 @@ export default function ProfessorDashboard() {
     } catch (e) { alert("Error al ocultar la clase"); }
   };
 
+  const getClassroomColor = (id: number) => {
+    const colors = ['#1967d2', '#137333', '#9334e6', '#e37400', '#007b83', '#b00020', '#188038', '#1a73e8'];
+    return colors[id % colors.length];
+  };
+
   return (
     <div className="app-container">
       <GlobalNav title="Mis Clases" breadcrumbs={[{ label: 'Mis Clases' }]} />
@@ -74,21 +83,75 @@ export default function ProfessorDashboard() {
           Nueva Clase
         </button>
 
-        <div className="grid">
+        <div className="grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
           {classes.map(c => (
-            <div key={c.id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '130px' }} onClick={() => navigate(`/profesor/clase/${c.id}`)}>
-              <div>
-                <h3>{c.name}</h3>
-                <p className="text-muted">ID: {c.id}</p>
+            <div 
+              key={c.id} 
+              style={{ 
+                cursor: 'pointer', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                background: '#ffffff',
+                border: '1px solid #dadce0',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                boxShadow: '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)',
+                transition: 'box-shadow 0.2s',
+                minHeight: '260px'
+              }} 
+              onClick={() => navigate(`/profesor/clase/${c.id}`)}
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15)'}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15)'}
+            >
+              {/* Card Header (Colored) */}
+              <div style={{ backgroundColor: getClassroomColor(c.id), color: '#ffffff', padding: '1rem 1.25rem', height: '100px', position: 'relative' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#ffffff' }}>{c.name}</h3>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', opacity: 0.9 }}>Universidad / Instituto</p>
+                
+                {/* Professor Avatar Circle floating on the edge */}
+                <div style={{
+                  position: 'absolute',
+                  right: '16px',
+                  bottom: '-30px',
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                }}>
+                  <div style={{ width: '52px', height: '52px', borderRadius: '50%', backgroundColor: '#e8eaed', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#5f6368', fontWeight: 500 }}>
+                    {professorName ? professorName.charAt(0).toUpperCase() : 'P'}
+                  </div>
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }} onClick={(e) => e.stopPropagation()}>
-                <button className="btn btn-secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.85rem' }} onClick={() => { setEditClassId(c.id); setEditClassName(c.name); setShowEditModal(true); }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                  Editar
+
+              {/* Card Body */}
+              <div style={{ padding: '1rem 1.25rem', flex: 1, paddingTop: '1.5rem' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#3c4043', fontWeight: 500 }}>{professorName}</p>
+              </div>
+
+              {/* Card Footer (Actions) */}
+              <div style={{ borderTop: '1px solid #e8eaed', padding: '0.5rem', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }} onClick={(e) => e.stopPropagation()}>
+                <button 
+                  style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Editar"
+                  onClick={() => { setEditClassId(c.id); setEditClassName(c.name); setShowEditModal(true); }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(60,64,67,0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                 </button>
-                <button className="btn btn-danger" style={{ padding: '0.2rem 0.6rem', fontSize: '0.85rem', background: '#D55E00' }} onClick={() => { setDeleteClassId(c.id); setDeleteClassName(c.name); setShowDeleteModal(true); }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                  Ocultar
+                <button 
+                  style={{ background: 'transparent', border: 'none', padding: '0.5rem', cursor: 'pointer', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Ocultar"
+                  onClick={() => { setDeleteClassId(c.id); setDeleteClassName(c.name); setShowDeleteModal(true); }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(60,64,67,0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
             </div>
