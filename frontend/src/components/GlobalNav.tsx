@@ -23,16 +23,14 @@ export default function GlobalNav({
   classId,
   className,
   termId,
-  termName,
-  unitId,
-  unitName
+  termName
 }: GlobalNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const role = localStorage.getItem('role');
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Removed unused mobileMenuOpen state
 
   const handleLogout = () => {
     localStorage.clear();
@@ -49,7 +47,7 @@ export default function GlobalNav({
     borderRight: '1px solid var(--border-color)',
     display: 'flex', flexDirection: 'column',
     zIndex: 1000,
-    transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(0)', // In a real app we'd hide this on mobile
+    transform: 'translateX(0)',
   };
 
   const topbarStyle: React.CSSProperties = {
