@@ -7,7 +7,7 @@ import GlobalNav from '../components/GlobalNav';
 export default function ClassDashboard() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'ESTUDIANTES' | 'GESTIONES' | 'REPORTES' | 'BITACORA'>('ESTUDIANTES');
+  const [activeTab, setActiveTab] = useState<'ESTUDIANTES' | 'GESTIONES' | 'REPORTES' | 'BITACORA'>('BITACORA');
   
   const [students, setStudents] = useState<any[]>([]);
   const [terms, setTerms] = useState<any[]>([]);
@@ -100,52 +100,45 @@ export default function ClassDashboard() {
 
   const handleEditStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editStudentId === null) return;
+    if (!editStudentId) return;
     try {
       await api.put(`/students/${editStudentId}`, {
-        first_name: editStudentFirst,
-        last_name: editStudentLast,
-        tutor_name: editStudentTutor,
-        tutor_phone: editStudentPhone
+        first_name: editStudentFirst, last_name: editStudentLast, tutor_name: editStudentTutor, tutor_phone: editStudentPhone
       });
-      setShowEditStudentModal(false);
-      fetchData();
-    } catch (e) { alert("Error al editar estudiante"); }
+      setShowEditStudentModal(false); setEditStudentId(null); fetchData();
+    } catch (e) { alert("Error al editar"); }
   };
 
   const handleDeleteStudent = async () => {
-    if (deleteStudentId === null) return;
+    if (!deleteStudentId) return;
     try {
       await api.delete(`/students/${deleteStudentId}`);
-      setShowDeleteStudentModal(false);
-      fetchData();
-    } catch (e) { alert("Error al ocultar estudiante"); }
+      setShowDeleteStudentModal(false); setDeleteStudentId(null); fetchData();
+    } catch (e) { alert("Error al eliminar"); }
   };
 
   const handleEditTerm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editTermId === null) return;
+    if (!editTermId) return;
     try {
       await api.put(`/terms/${editTermId}`, { name: editTermName });
-      setShowEditTermModal(false);
-      fetchData();
-    } catch (e) { alert("Error al editar gestión"); }
+      setShowEditTermModal(false); setEditTermId(null); fetchData();
+    } catch (e) { alert("Error al editar"); }
   };
 
   const handleDeleteTerm = async () => {
-    if (deleteTermId === null) return;
+    if (!deleteTermId) return;
     try {
       await api.delete(`/terms/${deleteTermId}`);
-      setShowDeleteTermModal(false);
-      fetchData();
-    } catch (e) { alert("Error al ocultar gestión"); }
+      setShowDeleteTermModal(false); setDeleteTermId(null); fetchData();
+    } catch (e) { alert("Error al eliminar"); }
   };
 
-  const handleFetchReport = async (studentId: number) => {
+  const fetchStudentReport = async (studentId: number) => {
     try {
       const res = await api.get(`/students/${studentId}/report`);
       setSelectedStudentReport(res.data);
-    } catch(e) { alert("Error cargando reporte"); }
+    } catch (e) { alert("Error al obtener reporte del estudiante"); }
   };
 
   // Centralizer PDF Generator Trigger
@@ -157,25 +150,47 @@ export default function ClassDashboard() {
   };
 
   return (
-    <div className="app-container fade-in">
-      <GlobalNav 
-        title={classGroup ? classGroup.name : 'Dashboard de la Clase'} 
-        breadcrumbs={[
-          { label: 'Mis Clases', path: '/profesor/clases' },
-          { label: classGroup?.name || 'Clase' }
-        ]}
-        classId={id}
-        className={classGroup?.name}
-      />
+    <div className="app-container">
+      <GlobalNav title={classGroup?.name || "Clase"} breadcrumbs={[{ label: 'Mis Clases', path: '/profesor/clases' }, { label: classGroup?.name || 'Clase' }]} classId={id} className={classGroup?.name} />
+      
+      <main className="fade-in">
+        {/* Banner de Clase (Google Classroom Style) */}
+        {classGroup && (
+          <div style={{
+            height: '160px',
+            backgroundColor: 'var(--color-primary)',
+            backgroundImage: 'linear-gradient(45deg, var(--color-primary) 0%, #005A9E 100%)',
+            borderRadius: '12px',
+            padding: '2rem',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            marginBottom: '2rem',
+            boxShadow: 'var(--shadow-card)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <h1 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 600 }}>{classGroup.name}</h1>
+            <p style={{ fontSize: '1rem', margin: '0.5rem 0 0 0', opacity: 0.9 }}>ID de Clase: {classGroup.id}</p>
+          </div>
+        )}
 
-      <div className="tabs">
-        <div className={`tab ${activeTab === 'ESTUDIANTES' ? 'active' : ''}`} onClick={() => setActiveTab('ESTUDIANTES')}>Estudiantes</div>
-        <div className={`tab ${activeTab === 'GESTIONES' ? 'active' : ''}`} onClick={() => setActiveTab('GESTIONES')}>Gestiones</div>
-        <div className={`tab ${activeTab === 'BITACORA' ? 'active' : ''}`} onClick={() => setActiveTab('BITACORA')}>Diario / Bitácora</div>
-        <div className={`tab ${activeTab === 'REPORTES' ? 'active' : ''}`} onClick={() => { setActiveTab('REPORTES'); setSelectedStudentReport(null); }}>Reportes Pedagógicos</div>
-      </div>
+        <div className="tabs" style={{ marginBottom: '2rem', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '2rem' }}>
+          <div className={`tab ${activeTab === 'BITACORA' ? 'active' : ''}`} onClick={() => setActiveTab('BITACORA')} style={{ padding: '1rem 0', fontWeight: 500, borderBottom: activeTab === 'BITACORA' ? '3px solid var(--color-primary)' : '3px solid transparent', cursor: 'pointer', color: activeTab === 'BITACORA' ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
+            Novedades / Sesiones
+          </div>
+          <div className={`tab ${activeTab === 'ESTUDIANTES' ? 'active' : ''}`} onClick={() => setActiveTab('ESTUDIANTES')} style={{ padding: '1rem 0', fontWeight: 500, borderBottom: activeTab === 'ESTUDIANTES' ? '3px solid var(--color-primary)' : '3px solid transparent', cursor: 'pointer', color: activeTab === 'ESTUDIANTES' ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
+            Personas
+          </div>
+          <div className={`tab ${activeTab === 'GESTIONES' ? 'active' : ''}`} onClick={() => setActiveTab('GESTIONES')} style={{ padding: '1rem 0', fontWeight: 500, borderBottom: activeTab === 'GESTIONES' ? '3px solid var(--color-primary)' : '3px solid transparent', cursor: 'pointer', color: activeTab === 'GESTIONES' ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
+            Gestiones (Trimestres)
+          </div>
+          <div className={`tab ${activeTab === 'REPORTES' ? 'active' : ''}`} onClick={() => setActiveTab('REPORTES')} style={{ padding: '1rem 0', fontWeight: 500, borderBottom: activeTab === 'REPORTES' ? '3px solid var(--color-primary)' : '3px solid transparent', cursor: 'pointer', color: activeTab === 'REPORTES' ? 'var(--color-primary)' : 'var(--color-text-muted)' }}>
+            Calificaciones / Reportes
+          </div>
+        </div>
 
-      <main>
         {activeTab === 'ESTUDIANTES' && (
           <div className="fade-in">
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
@@ -257,71 +272,66 @@ export default function ClassDashboard() {
         )}
 
         {activeTab === 'BITACORA' && (
-          <div className="fade-in">
-            <h2 style={{ marginBottom: '1.5rem' }}>Diario de Clases / Bitácora</h2>
-            {diaryEntries.length === 0 ? (
-              <p className="text-muted">Aún no hay sesiones creadas en esta clase.</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                {diaryEntries.map((entry: any) => (
-                  <div key={entry.session_id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderLeft: entry.is_finalized ? '4px solid var(--color-success)' : '4px solid var(--color-accent)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                      <div>
-                        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                          Día de clases: {entry.session_date}
-                        </h3>
-                        <p className="text-muted" style={{ marginTop: '0.2rem' }}>
-                          Gestión: <strong>{entry.term_name}</strong> | Unidad: <strong>{entry.unit_name}</strong>
-                        </p>
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <span className="badge-finalized" style={{ 
-                          background: entry.is_finalized ? 'rgba(0, 158, 115, 0.15)' : 'rgba(230, 159, 0, 0.15)',
-                          color: entry.is_finalized ? 'var(--color-success)' : 'var(--color-accent)',
-                          borderColor: entry.is_finalized ? 'rgba(0, 158, 115, 0.3)' : 'rgba(230, 159, 0, 0.3)',
-                          animation: 'none'
-                        }}>
-                          <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: entry.is_finalized ? 'var(--color-success)' : 'var(--color-accent)', marginRight: '6px' }}></span>
-                          {entry.is_finalized ? "Finalizada" : "Borrador / Activo"}
-                        </span>
-                        <button className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }} onClick={() => navigate(`/profesor/sesion/${entry.session_id}`)}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                          Entrar a Evaluar
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', background: 'rgba(0,0,0,0.15)', padding: '1rem', borderRadius: '8px' }}>
-                      <div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Asistencia</p>
-                        <p style={{ fontWeight: 'bold', marginTop: '0.1rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-success)'}}></span> {entry.attendance.presents} | 
-                          <span style={{display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-accent)'}}></span> {entry.attendance.lates} | 
-                          <span style={{display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-danger)'}}></span> {entry.attendance.absents}
-                        </p>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Actividades Totales</p>
-                        <p style={{ fontWeight: 'bold', marginTop: '0.1rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                          {entry.total_activities}
-                        </p>
-                      </div>
-                    </div>
-
-                    {entry.summary_notes ? (
-                      <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                        <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '0.2rem' }}>Observaciones Pedagógicas:</p>
-                        <p style={{ fontStyle: 'italic', fontSize: '0.9rem' }}>"{entry.summary_notes}"</p>
-                      </div>
-                    ) : (
-                      <p className="text-muted" style={{ fontStyle: 'italic', fontSize: '0.85rem' }}>Sin observaciones registradas.</p>
-                    )}
-                  </div>
-                ))}
+          <div className="fade-in" style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: '2rem', alignItems: 'start' }}>
+            
+            {/* Tareas / Próximas Entregas (Google Classroom style) */}
+            <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '1.25rem', backgroundColor: 'var(--color-surface)' }}>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: 500, margin: '0 0 1rem 0' }}>Próximas tareas</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+                ¡Wuuu! No tienes tareas para entregar pronto.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <a href="#" style={{ fontSize: '0.85rem', color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 500 }}>Ver todo</a>
               </div>
-            )}
+            </div>
+
+            {/* Stream / Sesiones */}
+            <div>
+              {diaryEntries.length === 0 ? (
+                <div style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '2rem', textAlign: 'center', backgroundColor: 'var(--color-surface)' }}>
+                  <p className="text-muted">Esta es la página de novedades. Aún no hay sesiones creadas en esta clase.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  {diaryEntries.map((entry: any) => (
+                    <div key={entry.session_id} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '1.5rem', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          </div>
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 500, color: 'var(--color-text)' }}>
+                              Nueva Sesión: {entry.session_date}
+                            </h3>
+                            <p className="text-muted" style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem' }}>
+                              {entry.term_name} — {entry.unit_name}
+                            </p>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                          <span style={{ 
+                            fontSize: '0.8rem', fontWeight: 500, padding: '0.2rem 0.6rem', borderRadius: '4px',
+                            background: entry.is_finalized ? 'rgba(24, 128, 56, 0.1)' : 'rgba(251, 188, 4, 0.1)',
+                            color: entry.is_finalized ? 'var(--color-success)' : 'var(--color-accent)',
+                          }}>
+                            {entry.is_finalized ? "Evaluada" : "En curso"}
+                          </span>
+                          <button className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }} onClick={() => navigate(`/profesor/sesion/${entry.session_id}`)}>
+                            Entrar
+                          </button>
+                        </div>
+                      </div>
+                      {entry.summary_notes && (
+                        <div style={{ marginLeft: '56px', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+                          {entry.summary_notes}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

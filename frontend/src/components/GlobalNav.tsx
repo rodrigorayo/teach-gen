@@ -30,7 +30,15 @@ export default function GlobalNav({
   const role = localStorage.getItem('role');
   
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  // Removed unused mobileMenuOpen state
+  const [myClasses, setMyClasses] = useState<any[]>([]);
+
+  useEffect(() => {
+    import('../api').then(({ default: api }) => {
+      api.get('/classes')
+        .then(res => setMyClasses(res.data))
+        .catch(() => {});
+    });
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -68,6 +76,11 @@ export default function GlobalNav({
     fontWeight: isActive ? 600 : 400,
     transition: 'background-color 0.2s',
   });
+
+  const getClassroomColor = (id: number) => {
+    const colors = ['#1967d2', '#137333', '#9334e6', '#e37400', '#007b83', '#b00020', '#188038', '#1a73e8'];
+    return colors[id % colors.length];
+  };
 
   return (
     <>
@@ -107,18 +120,29 @@ export default function GlobalNav({
             </div>
           )}
 
+          {/* All Classes quick access list */}
+          <div style={{ margin: '1rem 1.5rem 0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Cursos Impartidos
+          </div>
+          {myClasses.map(c => (
+            <div 
+              key={c.id}
+              style={{ ...navItemStyle(location.pathname.includes(`/clase/${c.id}`)), padding: '0.6rem 1.5rem', fontSize: '0.9rem' }} 
+              onClick={() => navigate(`/profesor/clase/${c.id}`)}
+            >
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: getClassroomColor(c.id), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                {c.name.charAt(0).toUpperCase()}
+              </div>
+              <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.name}</span>
+            </div>
+          ))}
+
           {/* Contextual Links */}
-          {(classId || termId) && (
+          {(termId) && (
             <>
               <div style={{ margin: '1rem 1.5rem 0.5rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Contexto Actual
               </div>
-              {classId && (
-                <div style={navItemStyle(location.pathname.includes(`/clase/${classId}`))} onClick={() => navigate(`/profesor/clase/${classId}`)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m4 6 8-4 8 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z"/><path d="M12 22v-10"/></svg>
-                  {className || "Clase"}
-                </div>
-              )}
               {termId && (
                 <div style={navItemStyle(location.pathname.includes(`/gestion/${termId}`))} onClick={() => navigate(`/profesor/gestion/${termId}`)}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
