@@ -19,7 +19,7 @@
   --shadow-glow: 0 4px 20px rgba(59, 130, 246, 0.25);
   --shadow-glow-accent: 0 4px 20px rgba(245, 158, 11, 0.25);
   --shadow-card: 0 12px 36px rgba(0, 0, 0, 0.35);
-  --border-radius: 28px; /* Android 16 Widget Rounded Corner */
+  --border-radius: 12px; /* Android 16 Widget Rounded Corner */
   --border-color: rgba(255, 255, 255, 0.04);
   
   /* Bouncy spring-like easing for organic motion */
@@ -81,7 +81,7 @@ body {
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
+  padding: 1.5rem 1rem;
   animation: pageSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -92,7 +92,7 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-card);
   transition: var(--transition);
   position: relative;
@@ -143,10 +143,10 @@ h3 { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 0.5rem; }
 /* Inputs & Forms with Material Design 3 Focus Ring */
 input, select, textarea {
   width: 100%;
-  padding: 1rem 1.2rem;
+  padding: 0.8rem 1rem;
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 16px;
+  border-radius: 8px;
   color: white;
   font-size: 1rem;
   transition: var(--transition);
@@ -161,8 +161,8 @@ input:focus, select:focus, textarea:focus {
 
 /* Pill-shaped Buttons with Ripple Effect */
 .btn {
-  padding: 0.8rem 1.8rem;
-  border-radius: 9999px; /* Pill */
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px; /* Rounded rect instead of pill */
   border: none;
   font-weight: 600;
   font-size: 0.95rem;
