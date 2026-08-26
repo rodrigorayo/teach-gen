@@ -5,6 +5,7 @@ import api from '../api';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -59,34 +60,27 @@ export default function Login() {
         boxSizing: 'border-box'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          {/* Google-like colorful logo text */}
+          {/* Refined clean logo text */}
           <h1 style={{ 
             margin: 0, 
-            fontSize: '24px', 
+            fontSize: '28px', 
             fontWeight: 500, 
-            letterSpacing: '-0.5px' 
+            letterSpacing: '-0.5px',
+            color: '#202124'
           }}>
-            <span style={{ color: '#4285F4' }}>T</span>
-            <span style={{ color: '#EA4335' }}>e</span>
-            <span style={{ color: '#FBBC05' }}>a</span>
-            <span style={{ color: '#4285F4' }}>c</span>
-            <span style={{ color: '#34A853' }}>h</span>
-            <span style={{ color: '#EA4335' }}>-</span>
-            <span style={{ color: '#FBBC05' }}>G</span>
-            <span style={{ color: '#4285F4' }}>e</span>
-            <span style={{ color: '#34A853' }}>n</span>
+            Teach-Gen
           </h1>
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 400, 
             color: '#202124', 
-            marginTop: '16px', 
+            marginTop: '12px', 
             marginBottom: '8px' 
           }}>
             Iniciar sesión
           </h2>
           <p style={{ fontSize: '16px', color: '#202124', margin: 0 }}>
-            Utiliza tu cuenta de Teach-Gen
+            Utiliza tu cuenta de educador
           </p>
         </div>
 
@@ -116,17 +110,17 @@ export default function Login() {
             />
           </div>
 
-          {/* Password Input */}
-          <div style={{ position: 'relative' }}>
+          {/* Password Input with Eye Icon */}
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
             <input 
-              type="password" 
+              type={showPassword ? "text" : "password"} 
               placeholder="Introduce tu contraseña" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               required 
               style={{
                 width: '100%',
-                padding: '13px 15px',
+                padding: '13px 45px 13px 15px',
                 fontSize: '16px',
                 border: '1px solid #dadce0',
                 borderRadius: '4px',
@@ -139,6 +133,35 @@ export default function Login() {
               onFocus={(e) => e.target.style.border = '2px solid #1a73e8'}
               onBlur={(e) => e.target.style.border = '1px solid #dadce0'}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '12px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#5f6368'
+              }}
+              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showPassword ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
           </div>
 
           {error && (
