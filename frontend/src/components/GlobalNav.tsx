@@ -9,8 +9,12 @@ interface BreadcrumbItem {
 interface GlobalNavProps {
   breadcrumbs?: BreadcrumbItem[];
   title?: string;
+  classId?: number | string;
+  className?: string;
   termId?: number | string;
   termName?: string;
+  unitId?: number | string;
+  unitName?: string;
 }
 
 export default function GlobalNav({
