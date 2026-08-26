@@ -123,6 +123,30 @@ export default function SessionAgileView() {
     await api.post(`/sessions/${id}/attendance?student_id=${studentId}&status=${nextStatus}`);
   };
 
+  const setAttendanceStatus = async (studentId: number, status: string) => {
+    setAttendances(prev => {
+      const filtered = prev.filter(a => a.student_id !== studentId);
+      filtered.push({ session_id: parseInt(id!), student_id: studentId, status });
+      return filtered;
+    });
+    await api.post(`/sessions/${id}/attendance?student_id=${studentId}&status=${status}`);
+  };
+
+  const handleKeyDownAttendance = (e: React.KeyboardEvent, studentId: number, index: number) => {
+    const key = e.key.toLowerCase();
+    if (key === 'p') setAttendanceStatus(studentId, 'P');
+    else if (key === 'f') setAttendanceStatus(studentId, 'F');
+    else if (key === 't' || key === 'a') setAttendanceStatus(studentId, 'A');
+    else if (key === 'l') setAttendanceStatus(studentId, 'L');
+    else if (key === 'enter' || key === 'arrowdown') {
+      e.preventDefault();
+      document.getElementById(`att-cell-${index + 1}`)?.focus();
+    } else if (key === 'arrowup') {
+      e.preventDefault();
+      document.getElementById(`att-cell-${index - 1}`)?.focus();
+    }
+  };
+
   const pickRandom = () => {
     if (students.length === 0) return;
     let cycles = 0;
@@ -243,7 +267,7 @@ export default function SessionAgileView() {
                 <div className="agile-cell agile-header" style={{ justifyContent: 'center' }}>Asistencia</div>
                 <div className="agile-cell agile-header" style={{ justifyContent: 'center' }}>Conducta</div>
 
-                {students.map(s => {
+                {students.map((s, index) => {
                   const att = getAttendance(s.id);
                   let attClass = "agile-cell clickable-cell";
                   if (att === 'P') attClass += " completed"; 
@@ -273,8 +297,12 @@ export default function SessionAgileView() {
 
                       {/* Attendance Cycling Toggle Cell */}
                       <div 
+                        id={`att-cell-${index}`}
+                        tabIndex={0}
                         className={attClass} 
                         onClick={() => toggleAttendance(s.id)} 
+                        onKeyDown={(e) => handleKeyDownAttendance(e, s.id, index)}
+ 
                         style={{ 
                           fontWeight: 'bold', 
                           fontSize: '1.1rem', 
