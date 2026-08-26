@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface BreadcrumbItem {
@@ -9,19 +9,13 @@ interface BreadcrumbItem {
 interface GlobalNavProps {
   breadcrumbs?: BreadcrumbItem[];
   title?: string;
-  classId?: number | string;
-  className?: string;
   termId?: number | string;
   termName?: string;
-  unitId?: number | string;
-  unitName?: string;
 }
 
 export default function GlobalNav({
   breadcrumbs = [],
   title = '',
-  classId,
-  className,
   termId,
   termName
 }: GlobalNavProps) {
@@ -35,7 +29,7 @@ export default function GlobalNav({
   useEffect(() => {
     import('../api').then(({ default: api }) => {
       api.get('/classes')
-        .then(res => setMyClasses(res.data))
+        .then((res: any) => setMyClasses(res.data))
         .catch(() => {});
     });
   }, []);

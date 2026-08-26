@@ -151,7 +151,7 @@ export default function ClassDashboard() {
 
   return (
     <div className="app-container">
-      <GlobalNav title={classGroup?.name || "Clase"} breadcrumbs={[{ label: 'Mis Clases', path: '/profesor/clases' }, { label: classGroup?.name || 'Clase' }]} classId={id} className={classGroup?.name} />
+      <GlobalNav title={classGroup?.name || "Clase"} breadcrumbs={[{ label: 'Mis Clases', path: '/profesor/clases' }, { label: classGroup?.name || 'Clase' }]} />
       
       <main className="fade-in">
         {/* Banner de Clase (Google Classroom Style) */}
@@ -347,7 +347,7 @@ export default function ClassDashboard() {
               <h2 style={{ marginBottom: '1rem' }}>Selecciona un Estudiante</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {students.map(s => (
-                  <div key={s.id} className="card" style={{ cursor: 'pointer', padding: '1rem' }} onClick={() => handleFetchReport(s.id)}>
+                  <div key={s.id} className="card" style={{ cursor: 'pointer', padding: '1rem' }} onClick={() => fetchStudentReport(s.id)}>
                     {s.first_name} {s.last_name}
                   </div>
                 ))}
