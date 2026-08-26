@@ -1,56 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 :root {
-  /* UAB Dark Mode - Deep Dark Blue & White */
-  --color-bg: #0A0F1D; /* Deep UAB Navy */
-  --color-surface: rgba(255, 255, 255, 0.05);
-  --color-surface-hover: rgba(255, 255, 255, 0.09);
-  --color-text: #F8FAFC;
-  --color-text-muted: #94A3B8;
+  /* Google Workspace Light Theme (Default) */
+  --color-bg: #f0f4f9;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f8f9fa;
+  --color-text: #202124;
+  --color-text-muted: #5f6368;
   
-  /* Accent Colors */
-  --color-primary: #3B82F6;    /* UAB Blue */
-  --color-secondary: #10B981;  /* Mint Green */
-  --color-accent: #F59E0B;     /* Amber */
-  --color-danger: #EF4444;     /* Coral Red */
-  --color-success: #10B981;    
-  --color-whatsapp: #25D366;
+  /* Google Brand Colors */
+  --color-primary: #1a73e8;    
+  --color-secondary: #188038;  
+  --color-accent: #fbbc04;     
+  --color-danger: #d93025;     
+  --color-success: #188038;    
+  --color-whatsapp: #188038;
   
-  --shadow-glow: 0 4px 20px rgba(59, 130, 246, 0.25);
-  --shadow-glow-accent: 0 4px 20px rgba(245, 158, 11, 0.25);
-  --shadow-card: 0 12px 36px rgba(0, 0, 0, 0.35);
-  --border-radius: 28px; /* Android 16 Widget Rounded Corner */
-  --border-color: rgba(255, 255, 255, 0.04);
+  --shadow-glow: none;
+  --shadow-glow-accent: none;
+  --shadow-card: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  --border-radius: 8px; /* Google standard radius */
+  --border-color: #dadce0;
   
-  /* Bouncy spring-like easing for organic motion */
-  --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition: all 0.2s ease-in-out;
 }
 
+body.dark-theme {
+  /* Google Workspace Dark Theme */
+  --color-bg: #202124;
+  --color-surface: #292a2d;
+  --color-surface-hover: #35363a;
+  --color-text: #e8eaed;
+  --color-text-muted: #9aa0a6;
+  
+  --color-primary: #8ab4f8;    
+  --color-secondary: #81c995;
+  --color-accent: #fdd663;
+  --color-danger: #f28b82;
+  --color-success: #81c995;
+  
+  --shadow-card: 0 1px 2px 0 rgba(0,0,0,0.3), 0 1px 3px 1px rgba(0,0,0,0.15);
+  --border-color: #5f6368;
+}
+
+/* Fallback for light-theme class to ensure it uses the root vars */
 body.light-theme {
-  /* UAB Light Mode - Slate White & Deep Dark Blue */
-  --color-bg: #F8FAFC; /* Slate white background */
-  --color-surface: #FFFFFF; /* Pure white container */
-  --color-surface-hover: #F1F5F9;
-  --color-text: #0F172A; /* Deep dark blue text */
-  --color-text-muted: #64748B;
-  
-  --color-primary: #1E3A8A;    /* UAB Deep Dark Blue */
-  --color-secondary: #059669;
-  --color-accent: #D97706;
-  --color-danger: #DC2626;
-  --color-success: #059669;
-  
-  --shadow-glow: 0 4px 20px rgba(30, 58, 138, 0.2);
-  --shadow-glow-accent: 0 4px 20px rgba(217, 119, 6, 0.2);
-  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.06);
-  --border-color: rgba(0, 0, 0, 0.08);
+  --color-bg: #f0f4f9;
+  --color-surface: #ffffff;
+  --color-text: #202124;
+  --color-text-muted: #5f6368;
+  --color-primary: #1a73e8;
+  --color-secondary: #188038;
+  --border-color: #dadce0;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Roboto', 'Google Sans', Arial, sans-serif;
 }
 
 body {
@@ -70,29 +78,32 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
+  background: #dadce0;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #bdc1c6;
 }
 
 /* App Wrapper */
 .app-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem;
-  animation: pageSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  padding: 1.5rem 1rem;
+  animation: pageFadeIn 0.3s ease forwards;
 }
 
-/* Material Tonal elevation Card */
+@keyframes pageFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Material Card */
 .card {
   background: var(--color-surface);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  padding: 2rem;
+  padding: 1.5rem;
   box-shadow: var(--shadow-card);
   transition: var(--transition);
   position: relative;
