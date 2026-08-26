@@ -159,6 +159,22 @@ export default function SessionAgileView() {
     }, 100);
   };
 
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const handleSyncSheets = async () => {
+    setIsSyncing(true);
+    try {
+      const sheetId = "1Sf2ItH9OWL_DUExBqdaQPxmmRjyMwwMYthqzwj_Obqs";
+      const tabName = "3erTrim";
+      const res = await api.post(`/sessions/${id}/sync-sheets`, { sheet_id: sheetId, tab_name: tabName });
+      alert(`¡Éxito! Se actualizaron ${res.data.updated_cells} asistencias en Google Sheets.`);
+    } catch (e: any) {
+      alert("Error al sincronizar con Sheets: " + (e.response?.data?.detail || e.message));
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const updateBehavior = async (studentId: number, points: number) => {
     await api.post(`/students/${studentId}/behavior?points=${points}`);
     setStudents(prev => prev.map(s => s.id === studentId ? { ...s, behavior_score: s.behavior_score + points } : s));
@@ -230,6 +246,11 @@ export default function SessionAgileView() {
               Actividades
             </button>
           </div>
+
+          <button className="btn" style={{ background: '#107c41', color: 'white', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid #107c41' }} onClick={handleSyncSheets} disabled={isSyncing}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            {isSyncing ? "Sincronizando..." : "Google Sheets"}
+          </button>
 
           <button className="btn" style={{ background: '#E69F00', color: 'white', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }} onClick={pickRandom}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>

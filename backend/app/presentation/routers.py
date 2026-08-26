@@ -331,6 +331,19 @@ def mark_attendance(session_id: int, student_id: int, status: str, db: Session =
 def get_attendance(session_id: int, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_professor)):
     return SessionService(db).get_attendance(session_id)
 
+from pydantic import BaseModel
+class SyncSheetsRequest(BaseModel):
+    sheet_id: str
+    tab_name: str
+
+@router.post("/sessions/{session_id}/sync-sheets")
+def sync_attendance_to_sheets(session_id: int, req: SyncSheetsRequest, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_professor)):
+    try:
+        return SessionService(db).sync_session_to_sheets(session_id, req.sheet_id, req.tab_name)
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail=str(e))
+
 @router.get("/sessions/{session_id}/activities", response_model=List[Activity])
 def read_activities(session_id: int, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_professor)):
     return ActivityService(db).get_by_session(session_id)

@@ -236,6 +236,33 @@ class SessionService:
     def get_attendance(self, session_id: int):
         from app.infrastructure.db_models import AttendanceDB
         return self.db.query(AttendanceDB).filter(AttendanceDB.session_id == session_id).all()
+        
+    def sync_session_to_sheets(self, session_id: int, sheet_id: str, tab_name: str):
+        from app.infrastructure.db_models import SessionDB, AttendanceDB, StudentDB
+        from app.infrastructure.sheets_client import sync_attendance_to_sheet
+        
+        session = self.db.query(SessionDB).filter(SessionDB.id == session_id).first()
+        if not session:
+            raise ValueError("Sesión no encontrada")
+            
+        attendances = self.db.query(AttendanceDB).filter(AttendanceDB.session_id == session_id).all()
+        
+        att_data = []
+        for att in attendances:
+            student = self.db.query(StudentDB).filter(StudentDB.id == att.student_id).first()
+            if student:
+                # Name format as in sheet: "LAST_NAME FIRST_NAME"
+                student_name = f"{student.first_name} {student.last_name}"
+                att_data.append({
+                    "student_name": student_name,
+                    "status": att.status
+                })
+                
+        # The date is stored as a string or Date object in SQLAlchemy. 
+        date_str = str(session.session_date) # YYYY-MM-DD
+        
+        updated_cells = sync_attendance_to_sheet(sheet_id, tab_name, date_str, att_data)
+        return {"updated_cells": updated_cells}
 
 class ActivityService:
     def __init__(self, db: Session):
