@@ -24,6 +24,7 @@ export default function SessionAgileView() {
   
   const [showModal, setShowModal] = useState(false);
   const [actTitle, setActTitle] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [randomStudentId, setRandomStudentId] = useState<number | null>(null);
 
@@ -39,7 +40,13 @@ export default function SessionAgileView() {
   // View Tab: 'attendance' (student list + attendance + behavior) or 'activities' (student list + activities)
   const [evaluationTab, setEvaluationTab] = useState<'attendance' | 'activities'>('attendance');
 
-  const fetchData = async () => {
+  
+  const filteredStudents = students.filter(s => 
+    `${s.first_name} ${s.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    formatStudentName(s.first_name, s.last_name).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+const fetchData = async () => {
     try {
       const [stRes, actRes, attRes, compRes, contextRes] = await Promise.all([
         api.get(`/sessions/${id}/students`),
@@ -276,7 +283,20 @@ export default function SessionAgileView() {
         </div>
       </div>
 
+      
       <main>
+        {students.length > 0 && (
+          <div style={{ marginBottom: '1.5rem', position: 'sticky', top: '70px', zIndex: 10 }}>
+            <input 
+              type="text" 
+              placeholder="🔍 Buscar estudiante por apellido o nombre..." 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              style={{ width: '100%', padding: '1rem', fontSize: '1.2rem', borderRadius: '12px', border: '2px solid var(--color-primary)', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+            />
+          </div>
+        )}
+
         {students.length === 0 ? (
           <p className="text-muted" style={{ textAlign: 'center', padding: '2rem' }}>Agrega estudiantes en el dashboard de la clase.</p>
         ) : (
@@ -288,7 +308,7 @@ export default function SessionAgileView() {
                 <div className="agile-cell agile-header" style={{ justifyContent: 'center' }}>Asistencia</div>
                 <div className="agile-cell agile-header" style={{ justifyContent: 'center' }}>Conducta</div>
 
-                {students.map((s, index) => {
+                {filteredStudents.map((s, index) => {
                   const att = getAttendance(s.id);
                   let attClass = "agile-cell clickable-cell";
                   if (att === 'P') attClass += " completed"; 
@@ -409,7 +429,7 @@ export default function SessionAgileView() {
                     </div>
                   ))}
 
-                  {students.map(s => (
+                  {filteredStudents.map(s => (
                     <div key={`act-row-${s.id}`} style={{ display: 'contents' }}>
                       <div 
                         className="agile-cell" 

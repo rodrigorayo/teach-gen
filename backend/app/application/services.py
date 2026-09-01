@@ -201,7 +201,14 @@ class SessionService:
         self.repository = SessionRepository(db)
         self.db = db
     def get_by_unit(self, unit_id: int): return self.repository.get_by_unit(unit_id)
-    def create(self, obj_in: SessionBase): return self.repository.create(obj_in)
+    def create(self, obj_in: SessionBase):
+        new_session = self.repository.create(obj_in)
+        from app.infrastructure.db_models import ActivityDB
+        for i in range(1, 4):
+            act = ActivityDB(title=f"Revisión {i}", session_id=new_session.id)
+            self.db.add(act)
+        self.db.commit()
+        return new_session
     def update(self, id: int, obj_in):
         db_obj = self.repository.get_by_id(id)
         if not db_obj: return None
