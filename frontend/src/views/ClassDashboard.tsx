@@ -149,6 +149,22 @@ export default function ClassDashboard() {
     } catch (e) { alert("Error al generar centralizador"); }
   };
 
+
+  // Agrupar sesiones por mes y ordenarlas de más antiguo a más nuevo
+  const getMonthYear = (dateStr: string) => {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+  };
+
+  const groupedEntries = [...diaryEntries]
+    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime())
+    .reduce((acc, entry) => {
+      const monthYear = getMonthYear(entry.session_date);
+      if (!acc[monthYear]) acc[monthYear] = [];
+      acc[monthYear].push(entry);
+      return acc;
+    }, {} as Record<string, any[]>);
+
   return (
     <div className="app-container">
       <GlobalNav title={classGroup?.name || "Clase"} breadcrumbs={[{ label: 'Mis Clases', path: '/profesor/clases' }, { label: classGroup?.name || 'Clase' }]} />
@@ -293,7 +309,17 @@ export default function ClassDashboard() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  {diaryEntries.map((entry: any) => (
+                  {Object.entries(groupedEntries).map(([monthYear, entries]) => (
+                    <div key={monthYear} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {/* Separador de Mes */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--color-text-muted)', letterSpacing: '1px' }}>
+                          {monthYear}
+                        </span>
+                        <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
+                      </div>
+                      {(entries as any[]).map((entry: any) => (
                     <div key={entry.session_id} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '1.5rem', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -327,6 +353,8 @@ export default function ClassDashboard() {
                           {entry.summary_notes}
                         </div>
                       )}
+                    </div>
+                  ))}
                     </div>
                   ))}
                 </div>
