@@ -61,6 +61,22 @@ export default function UnitView() {
     } catch (e) { alert("Error al ocultar la sesión"); }
   };
 
+
+  // Agrupar sesiones por mes y ordenarlas de más antiguo a más nuevo
+  const getMonthYear = (dateStr: string) => {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+  };
+
+  const groupedSessions = [...sessions]
+    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime())
+    .reduce((acc, session) => {
+      const monthYear = getMonthYear(session.session_date);
+      if (!acc[monthYear]) acc[monthYear] = [];
+      acc[monthYear].push(session);
+      return acc;
+    }, {} as Record<string, any[]>);
+
   return (
     <div className="app-container fade-in">
       <GlobalNav 
@@ -85,30 +101,43 @@ export default function UnitView() {
           Nueva Sesión
         </button>
 
-        <div className="grid">
-          {sessions.map(s => (
-            <div key={s.id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '120px' }} onClick={() => navigate(`/profesor/sesion/${s.id}`)}>
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                Fecha: {s.session_date}
-              </h3>
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }} onClick={(e) => e.stopPropagation()}>
-                <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => {
-                  setEditSessionId(s.id);
-                  setEditSessionDate(s.session_date);
-                  setShowEditModal(true);
-                }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                  Editar
-                </button>
-                <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', background: '#D55E00' }} onClick={() => {
-                  setDeleteSessionId(s.id);
-                  setDeleteSessionDate(s.session_date);
-                  setShowDeleteModal(true);
-                }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                  Ocultar
-                </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+          {Object.entries(groupedSessions).map(([monthYear, monthSessions]) => (
+            <div key={monthYear} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
+                <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--color-text-muted)', letterSpacing: '1px' }}>
+                  {monthYear}
+                </span>
+                <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
+              </div>
+              <div className="grid">
+                {(monthSessions as any[]).map(s => (
+                  <div key={s.id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '120px' }} onClick={() => navigate(`/profesor/sesion/${s.id}`)}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                      Fecha: {s.session_date}
+                    </h3>
+                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }} onClick={(e) => e.stopPropagation()}>
+                      <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => {
+                        setEditSessionId(s.id);
+                        setEditSessionDate(s.session_date);
+                        setShowEditModal(true);
+                      }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        Editar
+                      </button>
+                      <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', background: '#D55E00' }} onClick={() => {
+                        setDeleteSessionId(s.id);
+                        setDeleteSessionDate(s.session_date);
+                        setShowDeleteModal(true);
+                      }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        Ocultar
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
