@@ -23,6 +23,36 @@ export default function UnitView() {
   const [deleteSessionId, setDeleteSessionId] = useState<number | null>(null);
   const [deleteSessionDate, setDeleteSessionDate] = useState('');
 
+  // Calendar State
+  const [currentDate, setCurrentDate] = useState(new Date());
+
+  const getMonthName = (date: Date) => {
+    return date.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+  };
+
+  const nextMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const prevMonth = () => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  
+  const getDaysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();
+  const getFirstDayOfMonth = (y: number, m: number) => new Date(y, m, 1).getDay();
+
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month); // 0 = Sun, 1 = Mon
+  const startingBlanks = firstDay === 0 ? 6 : firstDay - 1;
+
+  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  const getSessionForDate = (day: number) => {
+    const formattedMonth = String(month + 1).padStart(2, '0');
+    const formattedDay = String(day).padStart(2, '0');
+    const targetDateStr = `${year}-${formattedMonth}-${formattedDay}`;
+    return sessions.find(s => s.session_date === targetDateStr);
+  };
+
+
   const fetchData = async () => {
     try {
       const [sessionsRes, contextRes] = await Promise.all([
@@ -62,22 +92,7 @@ export default function UnitView() {
   };
 
 
-  // Agrupar sesiones por mes y ordenarlas de más antiguo a más nuevo
-  const getMonthYear = (dateStr: string) => {
-    const d = new Date(dateStr + 'T12:00:00');
-    return d.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-  };
-
-  const groupedSessions = [...sessions]
-    .sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime())
-    .reduce((acc, session) => {
-      const monthYear = getMonthYear(session.session_date);
-      if (!acc[monthYear]) acc[monthYear] = [];
-      acc[monthYear].push(session);
-      return acc;
-    }, {} as Record<string, any[]>);
-
-  return (
+    return (
     <div className="app-container fade-in">
       <GlobalNav 
         title="Sesiones de la Unidad"
@@ -96,51 +111,117 @@ export default function UnitView() {
       />
 
       <main>
-        <button className="btn btn-primary" style={{ marginBottom: '2rem' }} onClick={() => setShowModal(true)}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-          Nueva Sesión
-        </button>
+        {/* Controles del Calendario */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'var(--color-surface)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
+          <button className="btn btn-secondary" onClick={prevMonth} style={{ padding: '0.5rem 1rem' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Anterior
+          </button>
+          
+          <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-primary)', letterSpacing: '1px' }}>
+            {getMonthName(currentDate)}
+          </h2>
+          
+          <button className="btn btn-secondary" onClick={nextMonth} style={{ padding: '0.5rem 1rem' }}>
+            Siguiente
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-          {Object.entries(groupedSessions).map(([monthYear, monthSessions]) => (
-            <div key={monthYear} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
-                <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--color-text-muted)', letterSpacing: '1px' }}>
-                  {monthYear}
-                </span>
-                <div style={{ height: '1px', flex: 1, backgroundColor: 'var(--border-color)' }}></div>
-              </div>
-              <div className="grid">
-                {(monthSessions as any[]).map(s => (
-                  <div key={s.id} className="card" style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '120px' }} onClick={() => navigate(`/profesor/sesion/${s.id}`)}>
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                      Fecha: {s.session_date}
-                    </h3>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }} onClick={(e) => e.stopPropagation()}>
-                      <button className="btn btn-secondary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }} onClick={() => {
-                        setEditSessionId(s.id);
-                        setEditSessionDate(s.session_date);
-                        setShowEditModal(true);
-                      }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-                        Editar
-                      </button>
-                      <button className="btn btn-danger" style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem', background: '#D55E00' }} onClick={() => {
-                        setDeleteSessionId(s.id);
-                        setDeleteSessionDate(s.session_date);
-                        setShowDeleteModal(true);
-                      }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                        Ocultar
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {/* Cuadrícula del Calendario */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1rem', marginBottom: '1rem' }}>
+          {['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'].map(day => (
+            <div key={day} style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+              {day}
             </div>
           ))}
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '1rem' }}>
+          {/* Días en blanco al inicio */}
+          {Array.from({ length: startingBlanks }).map((_, i) => (
+            <div key={`blank-${i}`} style={{ minHeight: '120px', borderRadius: '8px', background: 'rgba(0,0,0,0.02)' }}></div>
+          ))}
+
+          {/* Días reales del mes */}
+          {daysArray.map(day => {
+            const session = getSessionForDate(day);
+            const formattedMonth = String(month + 1).padStart(2, '0');
+            const formattedDay = String(day).padStart(2, '0');
+            const dateStr = `${year}-${formattedMonth}-${formattedDay}`;
+
+            return (
+              <div 
+                key={day} 
+                style={{ 
+                  minHeight: '120px', 
+                  borderRadius: '12px', 
+                  border: session ? '2px solid var(--color-primary)' : '1px dashed var(--border-color)',
+                  background: session ? 'var(--color-surface)' : 'transparent',
+                  padding: '0.8rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  position: 'relative'
+                }}
+                className="calendar-cell hover-scale"
+                onClick={() => {
+                  if (session) {
+                    navigate(`/profesor/sesion/${session.id}`);
+                  } else {
+                    setSessionDate(dateStr);
+                    setShowModal(true);
+                  }
+                }}
+              >
+                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: session ? 'var(--color-text)' : 'var(--color-text-muted)' }}>
+                  {day}
+                </div>
+                
+                {session ? (
+                  <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span style={{ 
+                      fontSize: '0.75rem', fontWeight: 600, padding: '0.3rem 0.5rem', borderRadius: '6px', textAlign: 'center',
+                      background: session.is_finalized ? 'rgba(24, 128, 56, 0.1)' : 'rgba(251, 188, 4, 0.1)',
+                      color: session.is_finalized ? 'var(--color-success)' : 'var(--color-accent)',
+                    }}>
+                      {session.is_finalized ? "Evaluada" : "En curso"}
+                    </span>
+                    
+                    {/* Botón Tuerca para opciones (stopPropagation para evitar entrar a la sesión) */}
+                    <div 
+                      style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', color: 'var(--color-text-muted)' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Al hacer clic en la tuerca, pre-cargamos para editar
+                        setEditSessionId(session.id);
+                        setEditSessionDate(session.session_date);
+                        setShowEditModal(true);
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <div
+                      style={{ position: 'absolute', top: '0.5rem', right: '2rem', color: '#D55E00' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteSessionId(session.id);
+                        setDeleteSessionDate(session.session_date);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ marginTop: 'auto', textAlign: 'center', opacity: 0.5 }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Create Modal */}
